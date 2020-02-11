@@ -1,0 +1,11 @@
+{
+  "devDependencies": {},
+  "dependencies": {
+    "@holochain/tryorama": "^0.3.0-rc.3",
+    "faucet": "0.0.1",
+    "fs": "0.0.1-security",
+    "json3": "*",
+    "sleep": "^6.1.0",
+    "tape": "^4.9.1"
+  }
+}

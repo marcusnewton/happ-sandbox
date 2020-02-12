@@ -78,6 +78,6 @@ module.exports = scenario => {
       { address: updateParent.Ok }
     );
     t.ok(getLinksAgainWithUpdateAddress.Ok);
-    t.deepEqual(getLinksAgainWithUpdateAddress.Ok.links.length, 1);
+    t.deepEqual(getLinksAgainWithUpdateAddress.Ok.links.length, 1); // not ok, even though updateParent.Ok is being intercepted and replaced with the first entry address
   });
 };

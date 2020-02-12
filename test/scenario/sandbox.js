@@ -78,6 +78,6 @@ module.exports = scenario => {
       { address: updateParent.Ok }
     );
     t.ok(getLinksAgainWithUpdateAddress.Ok);
-    t.deepEqual(getLinksAgainWithUpdateAddress.Ok.links.length, 1); // not ok. child link does not get transferred to updated entry
+    t.deepEqual(getLinksAgainWithUpdateAddress.Ok.links.length, 1);
   });
 };

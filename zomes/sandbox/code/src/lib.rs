@@ -121,8 +121,27 @@ mod my_zome {
 
     #[zome_fn("hc_public")]
     fn get_children(address: Address) -> ZomeApiResult<GetLinksResult> {
-        hdk::get_links(
+        let get_entry_result = hdk::get_entry_result(
             &address,
+            GetEntryOptions {
+                status_request: StatusRequestKind::Initial,
+                entry: false,
+                headers: true,
+                timeout: Default::default(),
+            },
+        )?;
+
+        let headers = match get_entry_result.result {
+            GetEntryResultType::Single(item) => Ok(item.headers),
+            _ => Err(ZomeApiError::Internal(
+                "Error getting headers of parent entry".into(),
+            )),
+        }?;
+
+        let canonical_address = headers[0].entry_address();
+
+        hdk::get_links(
+            &canonical_address,
             LinkMatch::Exactly("parent_to_child"),
             LinkMatch::Any,
         )

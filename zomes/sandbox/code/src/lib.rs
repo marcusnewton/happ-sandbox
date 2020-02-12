@@ -100,7 +100,17 @@ mod my_zome {
     fn create_my_child_entry(parent: Address, entry: MyChildEntry) -> ZomeApiResult<Address> {
         let entry = Entry::App("my_child_entry".into(), entry.into());
         let address = hdk::commit_entry(&entry)?;
-        let _link = hdk::link_entries(&parent, &address, "parent_to_child", "")?;
+
+        // Ensure latest parent
+        // Get latest entry
+        let latest_entry = match hdk::get_entry(&parent)? {
+            Some(entry) => Ok(entry),
+            None => Err(ZomeApiError::Internal("Failed to get latest entry".into())),
+        }?;
+        // Get latest address
+        let latest_address = hdk::entry_address(&latest_entry)?;
+
+        let _link = hdk::link_entries(&latest_address, &address, "parent_to_child", "")?;
         Ok(address)
     }
 

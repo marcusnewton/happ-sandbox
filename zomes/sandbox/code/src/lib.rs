@@ -121,24 +121,15 @@ mod my_zome {
 
     #[zome_fn("hc_public")]
     fn get_children(address: Address) -> ZomeApiResult<GetLinksResult> {
-        let get_entry_result = hdk::get_entry_result(
-            &address,
-            GetEntryOptions {
-                status_request: StatusRequestKind::All,
-                entry: false,
-                headers: true,
-                timeout: Default::default(),
+        let get_entry_history = hdk::get_entry_history(&address)?;
+
+        let canonical_address = match get_entry_history {
+            Some(entry_history) => match entry_history.items[0].meta.clone() {
+                Some(meta) => Ok(meta.address),
+                None => Err(ZomeApiError::Internal("Error getting entry meta".into())),
             },
-        )?;
-
-        let items = match get_entry_result.result {
-            GetEntryResultType::All(entry_history) => Ok(entry_history.items),
-            _ => Err(ZomeApiError::Internal(
-                "Error getting headers of parent entry".into(),
-            )),
+            None => Err(ZomeApiError::Internal("Error getting entry history".into())),
         }?;
-
-        let canonical_address = items[0].headers[0].entry_address();
 
         hdk::get_links(
             &canonical_address,

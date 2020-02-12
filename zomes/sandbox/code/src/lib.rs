@@ -124,21 +124,21 @@ mod my_zome {
         let get_entry_result = hdk::get_entry_result(
             &address,
             GetEntryOptions {
-                status_request: StatusRequestKind::Initial,
+                status_request: StatusRequestKind::All,
                 entry: false,
                 headers: true,
                 timeout: Default::default(),
             },
         )?;
 
-        let headers = match get_entry_result.result {
-            GetEntryResultType::Single(item) => Ok(item.headers),
+        let items = match get_entry_result.result {
+            GetEntryResultType::All(entry_history) => Ok(entry_history.items),
             _ => Err(ZomeApiError::Internal(
                 "Error getting headers of parent entry".into(),
             )),
         }?;
 
-        let canonical_address = headers[0].entry_address();
+        let canonical_address = items[0].headers[0].entry_address();
 
         hdk::get_links(
             &canonical_address,

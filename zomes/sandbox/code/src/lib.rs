@@ -141,8 +141,17 @@ mod my_zome {
 
     #[zome_fn("hc_public")]
     fn get_children(address: Address) -> ZomeApiResult<GetLinksResult> {
+        // Get up to date parent
+        // Get latest entry
+        let latest_entry = match hdk::get_entry(&address)? {
+            Some(entry) => Ok(entry),
+            None => Err(ZomeApiError::Internal("Failed to get latest entry".into())),
+        }?;
+        // Get latest address
+        let latest_address = hdk::entry_address(&latest_entry)?;
+
         hdk::get_links(
-            &address,
+            &latest_address,
             LinkMatch::Exactly("parent_to_child"),
             LinkMatch::Any,
         )

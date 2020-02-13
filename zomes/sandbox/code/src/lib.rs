@@ -106,27 +106,7 @@ mod my_zome {
 
     #[zome_fn("hc_public")]
     fn update_my_parent_entry(address: Address, entry: MyParentEntry) -> ZomeApiResult<Address> {
-        let updated_parent_address = hdk::update_entry(entry.into(), &address)?;
-
-        // Now, copy links to new parent address
-        let children_links_result = hdk::get_links(
-            &address,
-            LinkMatch::Exactly("parent_to_child"),
-            LinkMatch::Any,
-        )?;
-
-        let child_links = children_links_result.links();
-
-        for child_link in child_links {
-            hdk::link_entries(
-                &updated_parent_address,
-                &child_link.address,
-                "parent_to_child",
-                "",
-            )?;
-        }
-
-        Ok(updated_parent_address)
+        hdk::update_entry(entry.into(), &address)
     }
 
     #[zome_fn("hc_public")]
@@ -141,24 +121,10 @@ mod my_zome {
 
     #[zome_fn("hc_public")]
     fn get_children(address: Address) -> ZomeApiResult<GetLinksResult> {
-        // Get up to date parent
-        // Get latest entry
-        let latest_entry = match hdk::get_entry(&address)? {
-            Some(entry) => Ok(entry),
-            None => Err(ZomeApiError::Internal("Failed to get latest entry".into())),
-        }?;
-        // Get latest address
-        let latest_address = hdk::entry_address(&latest_entry)?;
-
         hdk::get_links(
-            &latest_address,
+            &address,
             LinkMatch::Exactly("parent_to_child"),
             LinkMatch::Any,
         )
-    }
-
-    #[zome_fn("hc_public")]
-    fn get_entry_history(address: Address) -> ZomeApiResult<Option<EntryHistory>> {
-        hdk::get_entry_history(&address)
     }
 }

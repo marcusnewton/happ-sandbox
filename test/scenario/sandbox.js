@@ -65,7 +65,7 @@ module.exports = scenario => {
       "sandbox",
       "sandbox",
       "get_children",
-      { address: createParent.Ok } // createParent.Ok gets converted into latest address
+      { address: createParent.Ok }
     );
     t.ok(getLinksAgain.Ok);
     t.deepEqual(getLinksAgain.Ok.links.length, 1);
@@ -75,9 +75,9 @@ module.exports = scenario => {
       "sandbox",
       "sandbox",
       "get_children",
-      { address: updateParent.Ok } // updateParent.Ok gets converted into latest address, but is already latest address
+      { address: updateParent.Ok }
     );
     t.ok(getLinksAgainWithUpdateAddress.Ok);
-    t.deepEqual(getLinksAgainWithUpdateAddress.Ok.links.length, 1);
+    t.deepEqual(getLinksAgainWithUpdateAddress.Ok.links.length, 1); // not ok. child link does not get transferred to updated entry
   });
 };

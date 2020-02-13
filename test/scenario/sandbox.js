@@ -1,83 +1,54 @@
 const { mainConfig } = require("../config");
 
 module.exports = scenario => {
-  scenario("update parent with child attached", async (s, t) => {
+  scenario("get entry history", async (s, t) => {
     const { alice } = await s.players({
       alice: mainConfig
     });
 
     await alice.spawn();
 
-    // create parent
-    const createParent = await alice.call(
+    // create entry
+    const createMyEntry = await alice.call(
       "sandbox",
       "sandbox",
-      "create_my_parent_entry",
+      "create_my_entry",
       {
         entry: {
-          content: "fooParentContent"
+          content: "fooContent"
         }
       }
     );
-    t.ok(createParent.Ok);
-
-    // create child
-    const createChild = await alice.call(
-      "sandbox",
-      "sandbox",
-      "create_my_child_entry",
-      {
-        parent: createParent.Ok,
-        entry: {
-          content: "fooChildContent"
-        }
-      }
-    );
-    t.ok(createChild.Ok);
+    t.ok(createMyEntry.Ok);
 
     await s.consistency();
 
-    // get links
-    const getLinks = await alice.call("sandbox", "sandbox", "get_children", {
-      address: createParent.Ok
-    });
-    t.ok(getLinks.Ok);
-    t.deepEqual(getLinks.Ok.links.length, 1);
-
-    // update parent
-    const updateParent = await alice.call(
+    // update entry
+    const updateMyEntry = await alice.call(
       "sandbox",
       "sandbox",
-      "update_my_parent_entry",
+      "update_my_entry",
       {
-        address: createParent.Ok,
+        address: createMyEntry.Ok,
         entry: {
-          content: "barParentContent"
+          content: "barContent"
         }
       }
     );
-    t.ok(updateParent.Ok);
+    t.ok(updateMyEntry.Ok);
 
     await s.consistency();
 
-    // get links again
-    const getLinksAgain = await alice.call(
+    const getOriginalMyEntry = await alice.call(
       "sandbox",
       "sandbox",
-      "get_children",
-      { address: createParent.Ok }
+      "get_original_address",
+      {
+        address: updateMyEntry.Ok
+      }
     );
-    t.ok(getLinksAgain.Ok);
-    t.deepEqual(getLinksAgain.Ok.links.length, 1);
-
-    // get links again with update address
-    const getLinksAgainWithUpdateAddress = await alice.call(
-      "sandbox",
-      "sandbox",
-      "get_children",
-      { address: updateParent.Ok }
-    );
-    t.ok(getLinksAgainWithUpdateAddress.Ok);
-    t.deepEqual(getLinksAgainWithUpdateAddress.Ok.links.length, 1); // not ok. child link does not get transferred to updated entry
+    t.ok(getOriginalMyEntry.Ok);
+    t.notEqual(getOriginalMyEntry.Ok, updateMyEntry.Ok);
+    t.equal(getOriginalMyEntry.Ok, createMyEntry.Ok);
   });
 };

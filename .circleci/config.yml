@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: holochain:holonix/latest.master
+      - image: holochain/holonix:latest.master
     steps:
       - checkout
       - run: nix-shell --run 'sandbox-test'
